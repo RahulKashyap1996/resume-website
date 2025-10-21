@@ -204,6 +204,103 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Certification Upload and Display
+    const uploadForm = document.getElementById('uploadForm');
+    const certificateGallery = document.getElementById('certificateGallery');
+
+    // Handle certificate upload
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('certificateFile');
+            const file = fileInput.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const certificate = document.createElement('div');
+                    certificate.className = 'certificate';
+
+                    if (file.type.includes('image')) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = file.name;
+                        certificate.appendChild(img);
+                    } else if (file.type.includes('pdf')) {
+                        const link = document.createElement('a');
+                        link.href = e.target.result;
+                        link.target = '_blank';
+                        link.textContent = file.name;
+                        certificate.appendChild(link);
+                    }
+
+                    certificateGallery.appendChild(certificate);
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+            // Reset form
+            uploadForm.reset();
+        });
+    }
+
+    // Certification Display by Tech Stack
+    const techStackFolders = {
+        python: 'certifications/python',
+        automationAnywhere: 'certifications/automation-anywhere',
+        sql: 'certifications/sql'
+    };
+
+    const galleries = {
+        python: document.getElementById('pythonGallery'),
+        automationAnywhere: document.getElementById('automationAnywhereGallery'),
+        sql: document.getElementById('sqlGallery')
+    };
+
+    // Function to load certificates from folders
+    function loadCertificates() {
+        Object.keys(techStackFolders).forEach(stack => {
+            const folderPath = techStackFolders[stack];
+            const gallery = galleries[stack];
+
+            // Simulate fetching files from folder (replace with actual backend logic if needed)
+            fetchCertificates(folderPath).forEach(file => {
+                const certificate = document.createElement('div');
+                certificate.className = 'certificate';
+
+                if (file.type === 'image') {
+                    const img = document.createElement('img');
+                    img.src = file.url;
+                    img.alt = file.name;
+                    certificate.appendChild(img);
+                } else if (file.type === 'pdf') {
+                    const link = document.createElement('a');
+                    link.href = file.url;
+                    link.target = '_blank';
+                    link.textContent = file.name;
+                    certificate.appendChild(link);
+                }
+
+                gallery.appendChild(certificate);
+            });
+        });
+    }
+
+    // Simulated function to fetch files (replace with actual logic)
+    function fetchCertificates(folderPath) {
+        // Example data structure
+        return [
+            { name: 'Certificate1.jpg', url: `${folderPath}/Certificate1.jpg`, type: 'image' },
+            { name: 'Certificate2.pdf', url: `${folderPath}/Certificate2.pdf`, type: 'pdf' }
+        ];
+    }
+
+    // Load certificates on page load
+    document.addEventListener('DOMContentLoaded', loadCertificates);
 });
 
 // Utility functions
