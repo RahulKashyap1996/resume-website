@@ -205,4 +205,9 @@ function waitForLibsAndInit() {
   initCertTabs();
 }
 
-document.addEventListener('DOMContentLoaded', waitForLibsAndInit);
+// Render certificates immediately for fast display
+document.addEventListener('DOMContentLoaded', () => {
+  initCertCarousels();
+  initCertTabs();
+  waitForLibsAndInit(); // Swiper and PDF.js will enhance after initial render
+});
