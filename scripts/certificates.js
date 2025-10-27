@@ -97,39 +97,24 @@ async function renderCertPreview(file, container) {
 async function renderCarousel(carouselId, files) {
   // Hide all .cert-subtab-content except the active one
   document.querySelectorAll('.cert-subtab-content').forEach(c => {
-    if (!c.classList.contains('active')) {
-      c.style.display = 'none';
-    } else {
-      c.style.display = '';
-    }
+    c.style.display = c.classList.contains('active') ? '' : 'none';
   });
   // Hide all .cert-tab-content except the active one
   document.querySelectorAll('.cert-tab-content').forEach(c => {
-    if (!c.classList.contains('active')) {
-      c.style.display = 'none';
-    } else {
-      c.style.display = '';
-    }
+    c.style.display = c.classList.contains('active') ? '' : 'none';
   });
-  // Clear all carousels except the active one
-  document.querySelectorAll('.cert-carousel').forEach(c => {
-    if (c.id !== carouselId) {
-      // Remove all children and destroy Swiper if exists
-      while (c.firstChild) c.removeChild(c.firstChild);
-      if (c.swiper) {
-        c.swiper.destroy(true, true);
-      }
-      c.removeAttribute('data-rendered');
-    }
-  });
+  // Only render if not already rendered
   const carousel = document.getElementById(carouselId);
   if (!carousel) return;
-  // Remove all children and destroy Swiper for the active carousel
-  while (carousel.firstChild) carousel.removeChild(carousel.firstChild);
-  if (carousel.swiper) {
-    carousel.swiper.destroy(true, true);
-  }
-  carousel.removeAttribute('data-rendered');
+  if (carousel.getAttribute('data-rendered') === 'true') return;
+  // Clear all carousels (remove children and destroy Swiper)
+  document.querySelectorAll('.cert-carousel').forEach(c => {
+    if (c.swiper) {
+      c.swiper.destroy(true, true);
+    }
+    while (c.firstChild) c.removeChild(c.firstChild);
+    c.removeAttribute('data-rendered');
+  });
   // Render new Swiper only for the active carousel
   const swiperWrapper = document.createElement('div');
   swiperWrapper.className = 'swiper-wrapper';
