@@ -60,7 +60,9 @@
     text-align: center;
 }
 .cert-subtab-content.active {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 /* Ensure the parent of cert-subtabs is full width and centered */
 .cert-tab-content, .cert-tab-content.active {
