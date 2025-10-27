@@ -14,6 +14,13 @@
 			"command": "start index.html",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "Open Resume Website",
+			"type": "shell",
+			"command": "python3 -m http.server 8000",
+			"isBackground": true,
+			"group": "build"
 		}
 	]
 }

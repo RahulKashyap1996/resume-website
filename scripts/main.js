@@ -11,6 +11,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 tab.classList.add('active');
                 const tabId = 'tab-' + tab.dataset.tab;
                 const content = document.getElementById(tabId);
+                if (content) {
+                    content.classList.add('active');
+                    // Activate first subtab if subtabs exist
+                    const firstSubtab = content.querySelector('.project-subtab');
+                    const firstSubtabContent = content.querySelector('.project-subtab-content');
+                    if (firstSubtab && firstSubtabContent) {
+                        firstSubtab.classList.add('active');
+                        firstSubtabContent.classList.add('active');
+                    }
+                }
+            });
+        });
+        
+        // Project Subtabs for Automation Anywhere
+        const projectSubtabs = document.querySelectorAll('.project-subtab');
+        const projectSubtabContents = document.querySelectorAll('.project-subtab-content');
+        projectSubtabs.forEach(subtab => {
+            subtab.addEventListener('click', function() {
+                projectSubtabs.forEach(s => s.classList.remove('active'));
+                projectSubtabContents.forEach(c => c.classList.remove('active'));
+                subtab.classList.add('active');
+                const subtabId = 'subtab-' + subtab.dataset.subtab;
+                const content = document.getElementById(subtabId);
                 if (content) content.classList.add('active');
             });
         });

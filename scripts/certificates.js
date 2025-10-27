@@ -95,27 +95,34 @@ async function renderCertPreview(file, container) {
 
 // Render carousel for a tab or subtab (no duplicate rendering)
 async function renderCarousel(carouselId, files) {
-  // Hide and clear all inactive carousels
-  document.querySelectorAll('.cert-carousel').forEach(c => {
-    if (c.id !== carouselId) {
-      if (c.swiper) {
-        c.swiper.destroy(true, true);
-      }
-      while (c.firstChild) c.removeChild(c.firstChild);
-      c.removeAttribute('data-rendered');
-      c.style.display = 'none';
-    }
-  });
-  // Show the active carousel and render only if not already rendered
   const carousel = document.getElementById(carouselId);
   if (!carousel) return;
-  carousel.style.display = '';
-  if (carousel.getAttribute('data-rendered') === 'true') return;
-  if (carousel.swiper) {
-    carousel.swiper.destroy(true, true);
+  
+  // If already rendered, just show it and return
+  if (carousel.getAttribute('data-rendered') === 'true') {
+    carousel.style.display = '';
+    // Hide all other carousels
+    document.querySelectorAll('.cert-carousel').forEach(c => {
+      if (c.id !== carouselId) {
+        c.style.display = 'none';
+      }
+    });
+    return;
   }
-  while (carousel.firstChild) carousel.removeChild(carousel.firstChild);
-  carousel.removeAttribute('data-rendered');
+  
+  // Clear ALL carousels completely before rendering
+  document.querySelectorAll('.cert-carousel').forEach(c => {
+    if (c.swiper) {
+      c.swiper.destroy(true, true);
+    }
+    while (c.firstChild) c.removeChild(c.firstChild);
+    c.removeAttribute('data-rendered');
+    c.style.display = 'none';
+  });
+  
+  // Now render the active carousel
+  carousel.style.display = '';
+  
   // Render new Swiper only for the active carousel
   const swiperWrapper = document.createElement('div');
   swiperWrapper.className = 'swiper-wrapper';
@@ -139,7 +146,7 @@ async function renderCarousel(carouselId, files) {
   const initialSlide = Math.floor(Math.random() * files.length);
   const reverse = Math.random() > 0.5;
   new Swiper(carousel, {
-    loop: true,
+    loop: files.length > 1,
     autoplay: {
       delay: 2500,
       disableOnInteraction: false,
@@ -147,11 +154,16 @@ async function renderCarousel(carouselId, files) {
       reverseDirection: reverse
     },
     navigation: { nextEl: nextBtn, prevEl: prevBtn },
-    slidesPerView: 1,
-    centeredSlides: true,
+    slidesPerView: 'auto',
+    slidesPerGroup: 1,
+    centeredSlides: false,
     spaceBetween: 30,
     effect: 'slide',
     initialSlide,
+    allowTouchMove: true,
+    simulateTouch: true,
+    freeMode: false,
+    speed: 600,
   });
   carousel.setAttribute('data-rendered', 'true');
 }
@@ -267,13 +279,11 @@ function waitForLibsAndInit() {
     setTimeout(waitForLibsAndInit, 200);
     return;
   }
-  initCertCarousels();
   initCertTabs();
+  initCertCarousels();
 }
 
-// Render certificates immediately for fast display
+// Render certificates only once after libs are loaded
 document.addEventListener('DOMContentLoaded', () => {
-  initCertCarousels();
-  initCertTabs();
-  waitForLibsAndInit(); // Swiper and PDF.js will enhance after initial render
+  waitForLibsAndInit();
 });
