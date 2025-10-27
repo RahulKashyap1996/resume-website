@@ -66,19 +66,20 @@ async function renderCertPreview(file, container) {
       };
       container.appendChild(img);
     } else if (isPDF(file)) {
-      // Show a static PDF icon for instant preview
-      const pdfIcon = document.createElement('div');
-      pdfIcon.innerHTML = '<span style="font-size:3rem; color:#764ba2;">📄</span><br><span style="color:#666;">PDF Certificate</span>';
-      pdfIcon.className = 'cert-preview-pdf';
-      pdfIcon.style.display = 'flex';
-      pdfIcon.style.flexDirection = 'column';
-      pdfIcon.style.alignItems = 'center';
-      pdfIcon.style.justifyContent = 'center';
-      pdfIcon.style.height = '180px';
-      pdfIcon.style.width = '140px';
-      pdfIcon.style.margin = '0 auto';
+      // Restore PDF.js preview of first page
+      const pdfjsLib = window['pdfjs-dist/build/pdf'];
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const pdf = await pdfjsLib.getDocument(file).promise;
+      const page = await pdf.getPage(1);
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      const viewport = page.getViewport({ scale: 0.5 });
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      await page.render({ canvasContext: context, viewport: viewport }).promise;
+      canvas.className = 'cert-preview-pdf';
       spinner.remove();
-      container.appendChild(pdfIcon);
+      container.appendChild(canvas);
     } else {
       spinner.innerHTML = '<span>Unsupported file type</span>';
     }
