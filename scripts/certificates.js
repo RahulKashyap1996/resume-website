@@ -66,34 +66,51 @@ async function renderCertPreview(file, container) {
       };
       container.appendChild(img);
     } else if (isPDF(file)) {
-      // Restore PDF.js preview of first page
-      const pdfjsLib = window['pdfjs-dist/build/pdf'];
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      const pdf = await pdfjsLib.getDocument(file).promise;
-      const page = await pdf.getPage(1);
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      const viewport = page.getViewport({ scale: 0.5 });
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      await page.render({ canvasContext: context, viewport: viewport }).promise;
-      canvas.className = 'cert-preview-pdf';
-      spinner.remove();
-      container.appendChild(canvas);
+      try {
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const pdf = await pdfjsLib.getDocument(file).promise;
+        const page = await pdf.getPage(1);
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const viewport = page.getViewport({ scale: 0.5 });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+        canvas.className = 'cert-preview-pdf';
+        spinner.remove();
+        container.appendChild(canvas);
+      } catch (pdfErr) {
+        spinner.innerHTML = '<span>PDF Preview failed</span>';
+        console.error('PDF Preview Error:', pdfErr);
+      }
     } else {
       spinner.innerHTML = '<span>Unsupported file type</span>';
     }
   } catch (err) {
     spinner.innerHTML = '<span>Preview failed</span>';
+    console.error('Certificate Preview Error:', err);
   }
 }
 
 // Render carousel for a tab or subtab (no duplicate rendering)
 async function renderCarousel(carouselId, files) {
+  // Hide all .cert-subtab-content except the active one
+  document.querySelectorAll('.cert-subtab-content').forEach(c => {
+    if (!c.classList.contains('active')) {
+      c.style.display = 'none';
+    } else {
+      c.style.display = 'block';
+    }
+  });
   // Clear all carousels before rendering
   document.querySelectorAll('.cert-carousel').forEach(c => {
     c.innerHTML = '';
     c.removeAttribute('data-rendered');
+    // Destroy Swiper instance if exists
+    if (c.swiper) {
+      c.swiper.destroy(true, true);
+    }
   });
   const carousel = document.getElementById(carouselId);
   if (!carousel) return;
