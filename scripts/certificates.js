@@ -103,24 +103,34 @@ async function renderCarousel(carouselId, files) {
       c.style.display = '';
     }
   });
-  // Clear all carousels before rendering, and remove any extra Swiper DOM wrappers
+  // Hide all .cert-tab-content except the active one
+  document.querySelectorAll('.cert-tab-content').forEach(c => {
+    if (!c.classList.contains('active')) {
+      c.style.display = 'none';
+    } else {
+      c.style.display = '';
+    }
+  });
+  // Clear all carousels except the active one
   document.querySelectorAll('.cert-carousel').forEach(c => {
-    // Remove all direct children except the one with class 'swiper-wrapper' (if any)
-    Array.from(c.children).forEach(child => {
-      if (!child.classList.contains('swiper-wrapper')) {
-        c.removeChild(child);
+    if (c.id !== carouselId) {
+      // Remove all children and destroy Swiper if exists
+      while (c.firstChild) c.removeChild(c.firstChild);
+      if (c.swiper) {
+        c.swiper.destroy(true, true);
       }
-    });
-    // Remove all swiper-wrapper elements (to prevent stacking)
-    Array.from(c.querySelectorAll('.swiper-wrapper')).forEach(sw => sw.remove());
-    c.removeAttribute('data-rendered');
-    // Destroy Swiper instance if exists
-    if (c.swiper) {
-      c.swiper.destroy(true, true);
+      c.removeAttribute('data-rendered');
     }
   });
   const carousel = document.getElementById(carouselId);
   if (!carousel) return;
+  // Remove all children and destroy Swiper for the active carousel
+  while (carousel.firstChild) carousel.removeChild(carousel.firstChild);
+  if (carousel.swiper) {
+    carousel.swiper.destroy(true, true);
+  }
+  carousel.removeAttribute('data-rendered');
+  // Render new Swiper only for the active carousel
   const swiperWrapper = document.createElement('div');
   swiperWrapper.className = 'swiper-wrapper';
   for (const file of files) {
