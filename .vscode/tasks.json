@@ -7,6 +7,13 @@
 			"command": "start index.html",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "Open Resume Website",
+			"type": "shell",
+			"command": "start index.html",
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }

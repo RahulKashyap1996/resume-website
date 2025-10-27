@@ -1,5 +1,22 @@
 // Mobile Navigation Toggle
 document.addEventListener('DOMContentLoaded', function() {
+    // Project Tabs for Featured Projects
+    function initProjectTabs() {
+        const projectTabs = document.querySelectorAll('.project-tab');
+        const projectTabContents = document.querySelectorAll('.project-tab-content');
+        projectTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                projectTabs.forEach(t => t.classList.remove('active'));
+                projectTabContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                const tabId = 'tab-' + tab.dataset.tab;
+                const content = document.getElementById(tabId);
+                if (content) content.classList.add('active');
+            });
+        });
+    }
+
+    initProjectTabs();
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
