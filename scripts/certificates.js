@@ -89,11 +89,13 @@ async function renderCertPreview(file, container) {
 
 // Render carousel for a tab or subtab (no duplicate rendering)
 async function renderCarousel(carouselId, files) {
+  // Clear all carousels before rendering
+  document.querySelectorAll('.cert-carousel').forEach(c => {
+    c.innerHTML = '';
+    c.removeAttribute('data-rendered');
+  });
   const carousel = document.getElementById(carouselId);
   if (!carousel) return;
-  // Always re-render
-  carousel.removeAttribute('data-rendered');
-  carousel.innerHTML = '';
   const swiperWrapper = document.createElement('div');
   swiperWrapper.className = 'swiper-wrapper';
   for (const file of files) {
@@ -189,13 +191,28 @@ document.addEventListener('DOMContentLoaded', () => {
 // Tab switching
 
 function initCertCarousels() {
-  renderCarousel('carousel-CSharp', certData.CSharp);
-  renderCarousel('carousel-SQL', certData.SQL);
-  renderCarousel('carousel-Microsoft', certData.Microsoft);
-  renderCarousel('carousel-Github', certData.Github);
-  renderCarousel('carousel-English', certData.English);
-  renderCarousel('carousel-AutomationAnywhere', certData.AutomationAnywhere);
-  renderCarousel('carousel-AssistEdge', certData.AssistEdge);
+  // Only render the active tab/subtab's carousel
+  const activeTab = document.querySelector('.cert-tab.active');
+  const activeTabContent = activeTab ? document.getElementById('tab-' + activeTab.dataset.tab) : null;
+  if (!activeTabContent) return;
+  // If RPA, check subtab
+  if (activeTab.dataset.tab === 'RPA') {
+    const activeSubtab = document.querySelector('.cert-subtab.active');
+    if (activeSubtab) {
+      if (activeSubtab.dataset.subtab === 'AutomationAnywhere') {
+        renderCarousel('carousel-AutomationAnywhere', certData.AutomationAnywhere);
+      } else if (activeSubtab.dataset.subtab === 'AssistEdge') {
+        renderCarousel('carousel-AssistEdge', certData.AssistEdge);
+      }
+    }
+  } else {
+    // Other tabs
+    if (activeTab.dataset.tab === 'CSharp') renderCarousel('carousel-CSharp', certData.CSharp);
+    if (activeTab.dataset.tab === 'SQL') renderCarousel('carousel-SQL', certData.SQL);
+    if (activeTab.dataset.tab === 'Microsoft') renderCarousel('carousel-Microsoft', certData.Microsoft);
+    if (activeTab.dataset.tab === 'Github') renderCarousel('carousel-Github', certData.Github);
+    if (activeTab.dataset.tab === 'English') renderCarousel('carousel-English', certData.English);
+  }
 }
 
 function initCertTabs() {
