@@ -11,8 +11,13 @@
 .cert-subtabs {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
+    width: 100%;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
 }
 .cert-subtab {
     background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%);
@@ -44,6 +49,10 @@
 }
 .cert-subtab-content {
     display: none;
+    width: 100%;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
 }
 .cert-subtab-content.active {
     display: block;
