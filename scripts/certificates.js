@@ -87,9 +87,12 @@ async function renderCertPreview(file, container) {
   }
 }
 
-// Render carousel for a tab or subtab
+// Render carousel for a tab or subtab (no duplicate rendering)
 async function renderCarousel(carouselId, files) {
   const carousel = document.getElementById(carouselId);
+  if (!carousel) return;
+  // Prevent duplicate rendering
+  if (carousel.getAttribute('data-rendered') === 'true') return;
   carousel.innerHTML = '';
   const swiperWrapper = document.createElement('div');
   swiperWrapper.className = 'swiper-wrapper';
@@ -127,9 +130,10 @@ async function renderCarousel(carouselId, files) {
     effect: 'slide',
     initialSlide,
   });
+  carousel.setAttribute('data-rendered', 'true');
 }
 
-// Modal for full certificate view
+// Modal for full certificate view (improved UI, zoom on click)
 function openCertModal(file) {
   const modal = document.getElementById('cert-modal');
   const modalContent = document.getElementById('cert-modal-content');
@@ -138,15 +142,33 @@ function openCertModal(file) {
     const img = document.createElement('img');
     img.src = file;
     img.alt = 'Certificate';
-    img.style.maxWidth = '90vw';
+    img.style.maxWidth = '600px';
     img.style.maxHeight = '80vh';
+    img.style.width = '100%';
+    img.style.borderRadius = '12px';
+    img.style.boxShadow = '0 8px 32px rgba(67,198,172,0.18)';
+    img.style.transition = 'transform 0.3s';
+    img.style.cursor = 'zoom-in';
+    let zoomed = false;
+    img.onclick = function() {
+      zoomed = !zoomed;
+      if (zoomed) {
+        img.style.transform = 'scale(1.5)';
+        img.style.cursor = 'zoom-out';
+      } else {
+        img.style.transform = 'scale(1)';
+        img.style.cursor = 'zoom-in';
+      }
+    };
     modalContent.appendChild(img);
   } else if (isPDF(file)) {
     const iframe = document.createElement('iframe');
     iframe.src = file;
-    iframe.style.width = '90vw';
+    iframe.style.width = '600px';
     iframe.style.height = '80vh';
+    iframe.style.maxWidth = '90vw';
     iframe.style.border = 'none';
+    iframe.style.borderRadius = '12px';
     modalContent.appendChild(iframe);
   } else {
     modalContent.textContent = 'Unsupported file type';
