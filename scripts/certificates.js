@@ -100,12 +100,19 @@ async function renderCarousel(carouselId, files) {
     if (!c.classList.contains('active')) {
       c.style.display = 'none';
     } else {
-      c.style.display = 'block';
+      c.style.display = '';
     }
   });
-  // Clear all carousels before rendering
+  // Clear all carousels before rendering, and remove any extra Swiper DOM wrappers
   document.querySelectorAll('.cert-carousel').forEach(c => {
-    c.innerHTML = '';
+    // Remove all direct children except the one with class 'swiper-wrapper' (if any)
+    Array.from(c.children).forEach(child => {
+      if (!child.classList.contains('swiper-wrapper')) {
+        c.removeChild(child);
+      }
+    });
+    // Remove all swiper-wrapper elements (to prevent stacking)
+    Array.from(c.querySelectorAll('.swiper-wrapper')).forEach(sw => sw.remove());
     c.removeAttribute('data-rendered');
     // Destroy Swiper instance if exists
     if (c.swiper) {
